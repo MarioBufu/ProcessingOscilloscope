@@ -1,1 +1,1 @@
-# ProcessingOscilloscope Work in progress
+# ProcessingOscilloscope Work In Progress
