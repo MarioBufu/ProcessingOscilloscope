@@ -4,6 +4,9 @@ int main()
 {
 	volatile int adcResult = 0;
 	SYSCTL_RCGCADC_R = 1 << 1;  //use ADC1
+	ADC1_ACTSS_R &= ~(1 << 3); // disable the ADC sequencer
+	
+	
 	SYSCTL_RCGCGPIO_R = (1 << 4); //enable gpio port e
 	GPIO_PORTE_DIR_R &= ~(1 << 1); // E as input
 	
@@ -11,11 +14,14 @@ int main()
 	GPIO_PORTE_DEN_R &= ~(1 << 1);// disable digital function for PE1
 	GPIO_PORTE_AMSEL_R = 1 << 1;// disable the analog isolation circuit
 	
-	ADC1_ACTSS_R &= ~(1 << 3); // disable the ADC sequencer
-	ADC1_EMUX_R = 0XF << 12; // sample seq 3 continously sample
+	
+	ADC1_EMUX_R = 0x0 << 12; // start converion with D3 bit of ADCPSSI reg
 	ADC1_SSMUX3_R = 2; // select PE1 as analog input
 	ADC1_SSCTL3_R = 0x2;// end of sequence
 	ADC1_ACTSS_R |= 1<<3; // enable the ADC sequencer
+	
+	// start conversion
+	ADC1_PSSI_R |= 1 << 3;
 	
 	while(1)
 	{
@@ -26,8 +32,14 @@ int main()
 			adcResult = ADC1_SSFIFO3_R;
 			// send data to pc
 			
-			// clear flag for next conversion
+			// clear flag
 			ADC1_ISC_R |= 1 << 3;
+		}
+		// check ADC status
+		if(ADC1_ACTSS_R & (1 << 16) == 0) // check busy flag
+		{
+			// start next conversion
+			ADC1_PSSI_R |= 1 << 3;
 		}
 	}
 	
