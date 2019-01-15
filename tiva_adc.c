@@ -1,33 +1,33 @@
-#include <lm4f120h5gr.h>
+#include <tm4c123.h>
 
 int main()
 {
 	volatile int adcResult = 0;
-	SYSCTL->RCGCADC |= 1 << 1;  //use ADC1
-	SYSCTL->RCGCGPIO |= (1 << 4); //enable gpio port e
-	GPIOE->DIR &= ~(1 << 1); // E as input
+	SYSCTL_RCGCADC_R = 1 << 1;  //use ADC1
+	SYSCTL_RCGCGPIO_R = (1 << 4); //enable gpio port e
+	GPIO_PORTE_DIR_R &= ~(1 << 1); // E as input
 	
-	GPIOE->AFSEL |= 1 << 1; // use PE1 as ADC input
-	GPIOE->DEN &= ~(1 << 1);// disable digital function for PE1
-	GPIOE->AMSEL |= 1 << 1;// disable the analog isolation circuit
+	GPIO_PORTE_AFSEL_R= 1 << 1; // use PE1 as ADC input
+	GPIO_PORTE_DEN_R &= ~(1 << 1);// disable digital function for PE1
+	GPIO_PORTE_AMSEL_R = 1 << 1;// disable the analog isolation circuit
 	
-	ADC1->ACTSS &= ~(1 << 3); // disable the ADC sequencer
-	ADC1->EMUX |= 0XF << 12; // sample seq 3 continously sample
-	ADC1->SSMUX3 |= 2; // select PE1 as analog input
-	ADC1->SSCTL3 |= 0x2;// end of sequence
-	ADC1->ACTSS |= 1<<3; // enable the ADC sequencer
+	ADC1_ACTSS_R &= ~(1 << 3); // disable the ADC sequencer
+	ADC1_EMUX_R = 0XF << 12; // sample seq 3 continously sample
+	ADC1_SSMUX3_R = 2; // select PE1 as analog input
+	ADC1_SSCTL3_R = 0x2;// end of sequence
+	ADC1_ACTSS_R |= 1<<3; // enable the ADC sequencer
 	
 	while(1)
 	{
 		// check if data is ready
-		if((ADC1->RIS & (1 << 3))
+		if((ADC1_RIS_R & (1 << 3))
 		{
 			// read data from ADC register
-			adcResult = ADC1->SSFIFO3;
+			adcResult = ADC1_SSFIFO3_R;
 			// send data to pc
 			
 			// clear flag for next conversion
-			ADC1->ISC |= 1 << 3;
+			ADC1_ISC_R |= 1 << 3;
 		}
 	}
 	
