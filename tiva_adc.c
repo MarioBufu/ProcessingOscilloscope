@@ -3,7 +3,7 @@
 int main()
 {
 	volatile int adcResult = 0;
-	SYSCTL->RCGCADC = 1 << 1;  //use ADC1
+	SYSCTL->RCGCADC |= 1 << 1;  //use ADC1
 	SYSCTL->RCGCGPIO = (1 << 4); //enable gpio port e
 	GPIOE->DIR &= ~(1 << 1); // E as input
 	
